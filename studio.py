@@ -2,6 +2,8 @@ import streamlit as st
 import os
 import shutil
 import subprocess
+import rawpy
+from PIL import Image
 
 st.set_page_config(page_title="Admin - Naveen Jewellers", layout="wide", page_icon="🔐")
 
@@ -45,15 +47,30 @@ with col_upload:
     categories = get_categories()
     selected_category = st.selectbox("Select category:", categories)
     
-    uploaded_files = st.file_uploader("Drop images", type=["png", "jpg", "jpeg", "webp"], accept_multiple_files=True, key="uploader")
+    # 🚨 ADDED .dng SUPPORT HERE 🚨
+    uploaded_files = st.file_uploader("Drop images", type=["png", "jpg", "jpeg", "webp", "dng"], accept_multiple_files=True, key="uploader")
     
     if uploaded_files and st.button("Publish All to Category"):
         cat_path = os.path.join(IMAGE_FOLDER, selected_category)
         for f in uploaded_files:
-            with open(os.path.join(cat_path, f.name.lower().replace(" ", "_")), "wb") as out:
-                out.write(f.getbuffer())
+            file_name = f.name.lower().replace(" ", "_")
+            ext = os.path.splitext(file_name)[1]
+            
+            # 🚨 THE NEW DNG AUTO-CONVERTER 🚨
+            if ext == '.dng':
+                with st.spinner(f"Converting raw file {f.name} to WebP..."):
+                    with rawpy.imread(f) as raw:
+                        rgb = raw.postprocess()
+                    img = Image.fromarray(rgb)
+                    # Change extension to .webp for the live site
+                    new_file_name = file_name.replace(".dng", ".webp")
+                    img.save(os.path.join(cat_path, new_file_name), "WEBP", quality=95)
+            else:
+                # Normal save for png/jpg/webp
+                with open(os.path.join(cat_path, file_name), "wb") as out:
+                    out.write(f.getbuffer())
         
-        st.success("Uploaded!")
+        st.success("Uploaded & Processed successfully!")
         del st.session_state["uploader"]
         st.rerun()
 
