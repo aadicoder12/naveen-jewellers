@@ -70,8 +70,6 @@ custom_css = """
 st.markdown(custom_css, unsafe_allow_html=True)
 
 # --- 3. PREMIUM FLOATING PRODUCT CARD RENDERER ---
-# --- 3. PREMIUM FLOATING PRODUCT CARD RENDERER ---
-# --- 3. PREMIUM FLOATING PRODUCT CARD RENDERER ---
 def render_premium_card(img_path, title):
     with open(img_path, "rb") as image_file:
         encoded_string = base64.b64encode(image_file.read()).decode()
@@ -86,11 +84,10 @@ def render_premium_card(img_path, title):
     encoded_message = urllib.parse.quote(raw_message)
     whatsapp_url = f"https://wa.me/{whatsapp_number}?text={encoded_message}"
     
-    # We removed the indentations here so Streamlit doesn't think it's a code block!
     html_code = f"""
 <div style="background-color: #FFFFFF; padding: 25px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #F7F5F0; margin-bottom: 25px; transition: transform 0.3s ease;">
     <div style="width: 100%; aspect-ratio: 1/1; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #FFFFFF; margin-bottom: 20px;">
-        <a href="data:{mime_type};base64,{encoded_string}" target="_blank" style="width: 100%; height: 100%; display: block;" title="Click to view high-resolution details">
+        <a href="#" onclick="fetch('data:{mime_type};base64,{encoded_string}').then(res=>res.blob()).then(blob=>window.open(URL.createObjectURL(blob),'_blank')); return false;" style="width: 100%; height: 100%; display: block;" title="Click to view high-resolution details">
             <img src="data:{mime_type};base64,{encoded_string}" loading="lazy" style="width: 100%; height: 100%; object-fit: contain; cursor: zoom-in; opacity: 0.92; transition: opacity 0.3s ease;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.92">
         </a>
     </div>
