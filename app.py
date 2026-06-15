@@ -79,15 +79,21 @@ def render_premium_card(img_path, title):
     if ext == ".png": mime_type = "image/png"
     elif ext == ".webp": mime_type = "image/webp"
     
-    whatsapp_number = "8439699542" 
+    # 1. WhatsApp Configuration
+    whatsapp_number = "919412977788" 
     raw_message = f"Hi Naveen Jewellers, I am interested in the {title}."
     encoded_message = urllib.parse.quote(raw_message)
     whatsapp_url = f"https://wa.me/{whatsapp_number}?text={encoded_message}"
     
+    # 2. High-Resolution GitHub URL (Bypasses all browser security blocks)
+    # This formats the Windows folder path into a safe web link
+    safe_url_path = img_path.replace('\\', '/').replace(' ', '%20')
+    github_high_res_url = f"https://raw.githubusercontent.com/aadicoder12/naveen-jewellers/main/{safe_url_path}"
+    
     html_code = f"""
 <div style="background-color: #FFFFFF; padding: 25px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #F7F5F0; margin-bottom: 25px; transition: transform 0.3s ease;">
     <div style="width: 100%; aspect-ratio: 1/1; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #FFFFFF; margin-bottom: 20px;">
-        <a href="#" onclick="fetch('data:{mime_type};base64,{encoded_string}').then(res=>res.blob()).then(blob=>window.open(URL.createObjectURL(blob),'_blank')); return false;" style="width: 100%; height: 100%; display: block;" title="Click to view high-resolution details">
+        <a href="{github_high_res_url}" target="_blank" style="width: 100%; height: 100%; display: block;" title="Click to view high-resolution details">
             <img src="data:{mime_type};base64,{encoded_string}" loading="lazy" style="width: 100%; height: 100%; object-fit: contain; cursor: zoom-in; opacity: 0.92; transition: opacity 0.3s ease;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.92">
         </a>
     </div>
