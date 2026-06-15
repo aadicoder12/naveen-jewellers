@@ -71,6 +71,7 @@ st.markdown(custom_css, unsafe_allow_html=True)
 
 # --- 3. PREMIUM FLOATING PRODUCT CARD RENDERER ---
 # --- 3. PREMIUM FLOATING PRODUCT CARD RENDERER ---
+# --- 3. PREMIUM FLOATING PRODUCT CARD RENDERER ---
 def render_premium_card(img_path, title):
     with open(img_path, "rb") as image_file:
         encoded_string = base64.b64encode(image_file.read()).decode()
@@ -80,30 +81,26 @@ def render_premium_card(img_path, title):
     if ext == ".png": mime_type = "image/png"
     elif ext == ".webp": mime_type = "image/webp"
     
-    # 🚨 THE WHATSAPP MAGIC 🚨
-    whatsapp_number = "919412977788" # India Country Code +91 followed by your number
+    whatsapp_number = "8439699542" 
     raw_message = f"Hi Naveen Jewellers, I am interested in the {title}."
     encoded_message = urllib.parse.quote(raw_message)
     whatsapp_url = f"https://wa.me/{whatsapp_number}?text={encoded_message}"
     
+    # We removed the indentations here so Streamlit doesn't think it's a code block!
     html_code = f"""
-        <div style="background-color: #FFFFFF; padding: 25px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #F7F5F0; margin-bottom: 25px; transition: transform 0.3s ease;">
-            
-            <div style="width: 100%; aspect-ratio: 1/1; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #FFFFFF; margin-bottom: 20px;">
-                <a href="data:{mime_type};base64,{encoded_string}" target="_blank" style="width: 100%; height: 100%; display: block;" title="Click to view high-resolution details">
-                    <img src="data:{mime_type};base64,{encoded_string}" loading="lazy" style="width: 100%; height: 100%; object-fit: contain; cursor: zoom-in; opacity: 0.92; transition: opacity 0.3s ease;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.92">
-                </a>
-            </div>
-            
-            <h3 style="text-align: center; font-size: 1.1rem; letter-spacing: 0.5px; margin: 0; padding-bottom: 5px; color: #222222 !important;">{title}</h3>
-            <div style="width: 30px; height: 2px; background-color: #D4AF37; margin: 0 auto 15px auto;"></div>
-            
-            <a href="{whatsapp_url}" target="_blank" style="display: block; width: 100%; text-align: center; background-color: #25D366; color: #FFFFFF; padding: 10px 0; border-radius: 4px; text-decoration: none; font-family: 'Montserrat', sans-serif; font-weight: 500; font-size: 0.85rem; letter-spacing: 0.5px; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(37, 211, 102, 0.2);" onmouseover="this.style.backgroundColor='#1EBE53'; this.style.boxShadow='0 6px 14px rgba(37, 211, 102, 0.3)';" onmouseout="this.style.backgroundColor='#25D366'; this.style.boxShadow='0 4px 10px rgba(37, 211, 102, 0.2)';">
-                <span style="font-size: 1.1rem; vertical-align: text-bottom; margin-right: 4px;">💬</span> Inquire on WhatsApp
-            </a>
-            
-        </div>
-    """
+<div style="background-color: #FFFFFF; padding: 25px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #F7F5F0; margin-bottom: 25px; transition: transform 0.3s ease;">
+    <div style="width: 100%; aspect-ratio: 1/1; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #FFFFFF; margin-bottom: 20px;">
+        <a href="data:{mime_type};base64,{encoded_string}" target="_blank" style="width: 100%; height: 100%; display: block;" title="Click to view high-resolution details">
+            <img src="data:{mime_type};base64,{encoded_string}" loading="lazy" style="width: 100%; height: 100%; object-fit: contain; cursor: zoom-in; opacity: 0.92; transition: opacity 0.3s ease;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.92">
+        </a>
+    </div>
+    <h3 style="text-align: center; font-size: 1.1rem; letter-spacing: 0.5px; margin: 0; padding-bottom: 5px; color: #222222 !important;">{title}</h3>
+    <div style="width: 30px; height: 2px; background-color: #D4AF37; margin: 0 auto 15px auto;"></div>
+    <a href="{whatsapp_url}" target="_blank" style="display: block; width: 100%; text-align: center; background-color: #25D366; color: #FFFFFF; padding: 10px 0; border-radius: 4px; text-decoration: none; font-family: 'Montserrat', sans-serif; font-weight: 500; font-size: 0.85rem; letter-spacing: 0.5px; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(37, 211, 102, 0.2);" onmouseover="this.style.backgroundColor='#1EBE53'; this.style.boxShadow='0 6px 14px rgba(37, 211, 102, 0.3)';" onmouseout="this.style.backgroundColor='#25D366'; this.style.boxShadow='0 4px 10px rgba(37, 211, 102, 0.2)';">
+        <span style="font-size: 1.1rem; vertical-align: text-bottom; margin-right: 4px;">💬</span> Inquire on WhatsApp
+    </a>
+</div>
+"""
     return html_code
 
 def get_categories():
