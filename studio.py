@@ -4,6 +4,10 @@ import shutil
 import subprocess
 import rawpy
 from PIL import Image
+import pillow_heif
+
+# Teach Python how to read Apple HEIC files
+pillow_heif.register_heif_opener()
 
 st.set_page_config(page_title="Admin - Naveen Jewellers", layout="wide", page_icon="🔐")
 
@@ -47,8 +51,8 @@ with col_upload:
     categories = get_categories()
     selected_category = st.selectbox("Select category:", categories)
     
-    # 🚨 ADDED .dng SUPPORT HERE 🚨
-    uploaded_files = st.file_uploader("Drop images", type=["png", "jpg", "jpeg", "webp", "dng"], accept_multiple_files=True, key="uploader")
+    # 🚨 ADDED .heic SUPPORT HERE 🚨
+    uploaded_files = st.file_uploader("Drop images", type=["png", "jpg", "jpeg", "webp", "dng", "heic"], accept_multiple_files=True, key="uploader")
     
     if uploaded_files and st.button("Publish All to Category"):
         cat_path = os.path.join(IMAGE_FOLDER, selected_category)
@@ -56,15 +60,22 @@ with col_upload:
             file_name = f.name.lower().replace(" ", "_")
             ext = os.path.splitext(file_name)[1]
             
-            # 🚨 THE NEW DNG AUTO-CONVERTER 🚨
+            # 🚨 THE DNG AUTO-CONVERTER 🚨
             if ext == '.dng':
                 with st.spinner(f"Converting raw file {f.name} to WebP..."):
                     with rawpy.imread(f) as raw:
                         rgb = raw.postprocess()
                     img = Image.fromarray(rgb)
-                    # Change extension to .webp for the live site
                     new_file_name = file_name.replace(".dng", ".webp")
                     img.save(os.path.join(cat_path, new_file_name), "WEBP", quality=95)
+                    
+            # 🚨 THE NEW IPHONE HEIC AUTO-CONVERTER 🚨
+            elif ext == '.heic':
+                with st.spinner(f"Converting iPhone HEIC {f.name} to WebP..."):
+                    img = Image.open(f)
+                    new_file_name = file_name.replace(".heic", ".webp")
+                    img.save(os.path.join(cat_path, new_file_name), "WEBP", quality=95)
+                    
             else:
                 # Normal save for png/jpg/webp
                 with open(os.path.join(cat_path, file_name), "wb") as out:
@@ -88,13 +99,10 @@ if selected_cat:
     if not all_files:
         st.info("No images here.")
     else:
-        # Define how many images per page
         items_per_page = 8
         total_pages = (len(all_files) - 1) // items_per_page + 1
-        
         page = st.number_input("Page number", min_value=1, max_value=total_pages, value=1)
         
-        # Calculate start/end indices for current page
         start_idx = (page - 1) * items_per_page
         end_idx = start_idx + items_per_page
         current_page_files = all_files[start_idx:end_idx]
@@ -116,20 +124,12 @@ st.write("Click below to automatically push your latest inventory to the interne
 if st.button("🌐 Sync Changes to Live Server", type="primary"):
     with st.spinner("Connecting to GitHub and uploading..."):
         try:
-            # Stage the changes in the images folder
             subprocess.run(["git", "add", "images/"], check=True)
-            
-            # Commit the changes
             subprocess.run(["git", "commit", "-m", "Auto-update inventory via Studio"], check=True)
-            
-            # Push to GitHub
             subprocess.run(["git", "push"], check=True)
-            
             st.success("🎉 Success! Your new inventory is live. (It may take 60 seconds to appear on the site).")
             st.balloons()
-            
         except subprocess.CalledProcessError as e:
-            # Handles the case where you click the button but haven't added new images
             if "nothing to commit" in str(e) or e.returncode == 1:
                 st.info("Everything is already up to date! No new changes to push.")
             else:
