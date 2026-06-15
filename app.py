@@ -97,6 +97,7 @@ def get_image_base64(img_path):
         return base64.b64encode(image_file.read()).decode()
 
 # --- 3. PREMIUM FLOATING PRODUCT CARD RENDERER ---
+# --- 3. PREMIUM FLOATING PRODUCT CARD RENDERER ---
 def render_premium_card(img_path, title):
     encoded_string = get_image_base64(img_path)
     
@@ -113,19 +114,19 @@ def render_premium_card(img_path, title):
     safe_url_path = img_path.replace('\\', '/').replace(' ', '%20')
     github_high_res_url = f"https://raw.githubusercontent.com/aadicoder12/naveen-jewellers/main/{safe_url_path}"
     
+    # Notice how every line below starts at the exact left edge!
     html_code = f"""
 <div class="premium-card">
-    <div class="img-container" style="width: 100%; aspect-ratio: 1/1; overflow: hidden; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: #FFFFFF; margin-bottom: 20px;">
-        <a href="{github_high_res_url}" target="_blank" style="width: 100%; height: 100%; display: block;" title="Click to view high-resolution details">
-            <img src="data:{mime_type};base64,{encoded_string}" loading="lazy" style="width: 100%; height: 100%; object-fit: contain; cursor: zoom-in; opacity: 0.95;">
-        </a>
-    </div>
-    <h3 style="text-align: center; font-size: 1.05rem; letter-spacing: 0.5px; margin: 0; padding-bottom: 5px; color: #222222 !important;">{title}</h3>
-    <div style="width: 25px; height: 2px; background-color: #D4AF37; margin: 0 auto 15px auto; border-radius: 2px;"></div>
-    
-    <a href="{whatsapp_url}" target="_blank" style="display: block; width: 100%; text-align: center; background-color: #25D366; color: #FFFFFF; padding: 12px 0; border-radius: 6px; text-decoration: none; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 0.85rem; letter-spacing: 0.5px; transition: all 0.3s ease;" onmouseover="this.style.backgroundColor='#1EBE53';" onmouseout="this.style.backgroundColor='#25D366';">
-        <span style="font-size: 1.1rem; vertical-align: text-bottom; margin-right: 4px;">💬</span> Inquire
-    </a>
+<div class="img-container" style="width: 100%; aspect-ratio: 1/1; overflow: hidden; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: #FFFFFF; margin-bottom: 20px;">
+<a href="{github_high_res_url}" target="_blank" style="width: 100%; height: 100%; display: block;" title="Click to view high-resolution details">
+<img src="data:{mime_type};base64,{encoded_string}" loading="lazy" style="width: 100%; height: 100%; object-fit: contain; cursor: zoom-in; opacity: 0.95;">
+</a>
+</div>
+<h3 style="text-align: center; font-size: 1.05rem; letter-spacing: 0.5px; margin: 0; padding-bottom: 5px; color: #222222 !important;">{title}</h3>
+<div style="width: 25px; height: 2px; background-color: #D4AF37; margin: 0 auto 15px auto; border-radius: 2px;"></div>
+<a href="{whatsapp_url}" target="_blank" style="display: block; width: 100%; text-align: center; background-color: #25D366; color: #FFFFFF; padding: 12px 0; border-radius: 6px; text-decoration: none; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 0.85rem; letter-spacing: 0.5px; transition: all 0.3s ease;" onmouseover="this.style.backgroundColor='#1EBE53';" onmouseout="this.style.backgroundColor='#25D366';">
+<span style="font-size: 1.1rem; vertical-align: text-bottom; margin-right: 4px;">💬</span> Inquire
+</a>
 </div>
 """
     return html_code
