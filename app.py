@@ -27,17 +27,14 @@ custom_css = """
 st.markdown(custom_css, unsafe_allow_html=True)
 
 # --- 3. PREMIUM PRODUCT CARD RENDERER ---
-# --- 3. PREMIUM PRODUCT CARD RENDERER ---
 def render_premium_card(img_path, title):
     with open(img_path, "rb") as image_file:
         encoded_string = base64.b64encode(image_file.read()).decode()
     
-    # --- ADD THIS MISSING LOGIC ---
     ext = os.path.splitext(img_path)[1].lower()
     mime_type = "image/jpeg"
     if ext == ".png": mime_type = "image/png"
     elif ext == ".webp": mime_type = "image/webp"
-    # ------------------------------
     
     html_code = f"""
         <div style="background-color: #FFFFFF; padding: 20px; border-radius: 4px; box-shadow: 0 8px 24px rgba(0,0,0,0.04); border: 1px solid #F0F0F0; margin-bottom: 15px;">
@@ -54,7 +51,8 @@ def get_categories():
     return sorted(categories) if categories else ["Uncategorized"]
 
 # 4. Brand Header
-st.markdown("<h1 style='text-align: center; font-size: 3.5rem; margin-top: 2rem;'>Naveen Jewellers</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; font-size: 3.5rem; margin-top: 2rem; color: #D4AF37;'>✨ Naveen Jewellers ✨</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; font-size: 18px; color: gray;'>Exclusive Luxury Collections</p>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; font-family: Lato; color: #444; letter-spacing: 1px; margin-bottom: 0.5rem;'>Near Hanuman Mandir, Nanda Devi, Almora (Uttarakhand) - 263601</p>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; font-family: Lato; color: #888; font-size: 0.9rem; margin-bottom: 3rem;'>📞 9412977788 &nbsp;|&nbsp; 9758838488 &nbsp;&nbsp;&bull;&nbsp;&nbsp; GST No: 05ABQPV7823F1Z7</p>", unsafe_allow_html=True)
 
