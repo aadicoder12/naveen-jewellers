@@ -131,7 +131,6 @@ def render_premium_card(img_path, title):
 """
     return html_code
 
-@st.cache_data(show_spinner=False)
 def get_categories():
     categories = [f.name for f in os.scandir(IMAGE_FOLDER) if f.is_dir()]
     return sorted(categories) if categories else ["Uncategorized"]
