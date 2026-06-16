@@ -3,102 +3,128 @@ import os
 import base64
 import urllib.parse
 
-# 1. Page Configuration (Optimized for speed)
+# 1. Page Configuration
 st.set_page_config(page_title="Naveen Jewellers", layout="wide", page_icon="✨", initial_sidebar_state="collapsed")
 
 IMAGE_FOLDER = "images"
 if not os.path.exists(IMAGE_FOLDER):
     os.makedirs(IMAGE_FOLDER)
 
-# --- 2. ULTRA-PREMIUM LUXURY CSS INJECTION ---
+# --- 2. EDITORIAL HIGH-FASHION CSS INJECTION ---
 custom_css = """
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap');
+    /* Import modern editorial fonts: Playfair for headers, Jost for clean minimal text */
+    @import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap');
     
     #MainMenu, footer, header {visibility: hidden;}
     
     .stApp { 
-        background-color: #FCFBF8; 
-        font-family: 'Montserrat', sans-serif; 
-        color: #333333; 
+        background-color: #FFFFFF; /* Pure white like Ejaa */
+        font-family: 'Jost', sans-serif; 
+        color: #111111; 
     }
     
     h1, h2, h3 { 
         font-family: 'Playfair Display', serif !important; 
-        color: #1A1A1A !important; 
+        color: #111111 !important; 
+        font-weight: 500 !important;
     }
     
     .block-container { 
         padding-top: 2rem !important; 
-        padding-bottom: 2rem !important; 
-        max-width: 1200px; 
+        padding-bottom: 4rem !important; 
+        max-width: 1300px; 
     }
     
-    /* Sleek, Modern Tabs */
+    /* Ejaa-Style Minimalist Tabs */
     .stTabs [data-baseweb="tab-list"] { 
-        gap: 30px; 
+        gap: 40px; 
         justify-content: center; 
-        border-bottom: 1px solid #EAE5DD; 
-        padding-bottom: 5px;
+        border-bottom: 1px solid #F0F0F0; 
+        padding-bottom: 15px;
+        margin-bottom: 30px;
     }
     .stTabs [data-baseweb="tab"] { 
-        font-family: 'Montserrat', sans-serif !important; 
+        font-family: 'Jost', sans-serif !important; 
         text-transform: uppercase !important; 
         letter-spacing: 2px !important; 
-        font-size: 13px !important; 
-        color: #A09E9A !important; 
+        font-size: 12px !important; 
+        color: #888888 !important; 
         background-color: transparent !important; 
         border: none !important; 
-        padding: 10px 15px !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 0 10px 10px 10px !important;
+        transition: color 0.3s ease;
     }
     .stTabs [data-baseweb="tab"]:hover { 
-        color: #D4AF37 !important; 
-        transform: translateY(-2px);
+        color: #111111 !important; 
     }
     .stTabs [aria-selected="true"] { 
-        color: #D4AF37 !important; 
-        font-weight: 600 !important; 
-        border-bottom: 2px solid #D4AF37 !important; 
+        color: #111111 !important; 
+        border-bottom: 1px solid #111111 !important; 
     }
 
-    /* Floating Card Animation */
-    .premium-card {
-        background-color: #FFFFFF; 
-        padding: 20px; 
-        border-radius: 12px; 
-        box-shadow: 0 4px 15px rgba(0,0,0,0.02); 
-        border: 1px solid #F7F5F0; 
-        margin-bottom: 20px; 
-        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    /* Editorial Product Card Classes */
+    .editorial-card {
+        text-align: center;
+        margin-bottom: 40px;
     }
-    .premium-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 15px 35px rgba(0,0,0,0.06);
-        border-color: #EAE5DD;
+    .img-wrapper {
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 15px;
+        background: #F9F9F9; /* Very soft gray behind the image */
+        aspect-ratio: 4/5; /* High-fashion portrait aspect ratio */
+    }
+    .img-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        cursor: zoom-in;
+    }
+    .img-wrapper:hover img {
+        transform: scale(1.08); /* Slow, smooth zoom on hover */
+    }
+    .product-title {
+        font-family: 'Jost', sans-serif;
+        font-size: 13px;
+        font-weight: 400;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #333333;
+        margin: 0 0 12px 0;
     }
     
-    /* Image Zoom Hover */
-    .img-container img {
-        transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+    /* The High-Fashion Inquire Button */
+    .btn-inquire {
+        display: inline-block;
+        padding: 10px 30px;
+        border: 1px solid #111111;
+        color: #111111;
+        text-decoration: none;
+        font-family: 'Jost', sans-serif;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        background: transparent;
+        transition: all 0.3s ease;
     }
-    .img-container:hover img {
-        transform: scale(1.05);
+    .btn-inquire:hover {
+        background: #111111;
+        color: #FFFFFF;
     }
 </style>
 """
 st.markdown(custom_css, unsafe_allow_html=True)
 
-# --- CACHING ENGINE (MASSIVE SPEED BOOST) ---
+# --- IMAGE CACHING ENGINE ---
 @st.cache_data(show_spinner=False)
 def get_image_base64(img_path):
-    """Memorizes the image data so it loads instantly next time."""
     with open(img_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode()
 
-# --- 3. PREMIUM FLOATING PRODUCT CARD RENDERER ---
-# --- 3. PREMIUM FLOATING PRODUCT CARD RENDERER ---
-def render_premium_card(img_path, title):
+# --- 3. EDITORIAL PRODUCT CARD RENDERER ---
+def render_editorial_card(img_path, title):
     encoded_string = get_image_base64(img_path)
     
     ext = os.path.splitext(img_path)[1].lower()
@@ -106,6 +132,7 @@ def render_premium_card(img_path, title):
     if ext == ".png": mime_type = "image/png"
     elif ext == ".webp": mime_type = "image/webp"
     
+    # WhatsApp Integration
     whatsapp_number = "919412977788" 
     raw_message = f"Hi Naveen Jewellers, I am interested in the {title}."
     encoded_message = urllib.parse.quote(raw_message)
@@ -114,19 +141,16 @@ def render_premium_card(img_path, title):
     safe_url_path = img_path.replace('\\', '/').replace(' ', '%20')
     github_high_res_url = f"https://raw.githubusercontent.com/aadicoder12/naveen-jewellers/main/{safe_url_path}"
     
-    # Notice how every line below starts at the exact left edge!
+    # Clean, borderless HTML matching the CSS
     html_code = f"""
-<div class="premium-card">
-<div class="img-container" style="width: 100%; aspect-ratio: 1/1; overflow: hidden; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: #FFFFFF; margin-bottom: 20px;">
-<a href="{github_high_res_url}" target="_blank" style="width: 100%; height: 100%; display: block;" title="Click to view high-resolution details">
-<img src="data:{mime_type};base64,{encoded_string}" loading="lazy" style="width: 100%; height: 100%; object-fit: contain; cursor: zoom-in; opacity: 0.95;">
-</a>
-</div>
-<h3 style="text-align: center; font-size: 1.05rem; letter-spacing: 0.5px; margin: 0; padding-bottom: 5px; color: #222222 !important;">{title}</h3>
-<div style="width: 25px; height: 2px; background-color: #D4AF37; margin: 0 auto 15px auto; border-radius: 2px;"></div>
-<a href="{whatsapp_url}" target="_blank" style="display: block; width: 100%; text-align: center; background-color: #25D366; color: #FFFFFF; padding: 12px 0; border-radius: 6px; text-decoration: none; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 0.85rem; letter-spacing: 0.5px; transition: all 0.3s ease;" onmouseover="this.style.backgroundColor='#1EBE53';" onmouseout="this.style.backgroundColor='#25D366';">
-<span style="font-size: 1.1rem; vertical-align: text-bottom; margin-right: 4px;">💬</span> Inquire
-</a>
+<div class="editorial-card">
+    <div class="img-wrapper">
+        <a href="{github_high_res_url}" target="_blank" title="View High-Res Image">
+            <img src="data:{mime_type};base64,{encoded_string}" loading="lazy">
+        </a>
+    </div>
+    <div class="product-title">{title}</div>
+    <a href="{whatsapp_url}" target="_blank" class="btn-inquire">Inquire</a>
 </div>
 """
     return html_code
@@ -135,21 +159,21 @@ def get_categories():
     categories = [f.name for f in os.scandir(IMAGE_FOLDER) if f.is_dir()]
     return sorted(categories) if categories else ["Uncategorized"]
 
-# --- 4. BRAND HEADER (LUXURY LAYOUT) ---
-st.markdown("<h1 style='text-align: center; font-size: 4rem; margin-top: 0.5rem; margin-bottom: 0; color: #D4AF37 !important;'>✨ Naveen Jewellers ✨</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; font-family: Montserrat; text-transform: uppercase; letter-spacing: 4px; font-size: 13px; color: #A09E9A; margin-top: 5px; margin-bottom: 1.5rem;'>Exclusive Luxury Collections</p>", unsafe_allow_html=True)
+# --- 4. EDITORIAL HEADER ---
+st.markdown("<h1 style='text-align: center; font-size: 3.5rem; margin-top: 1rem; margin-bottom: 0; letter-spacing: 1px;'>Naveen Jewellers</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; font-family: Jost; text-transform: uppercase; letter-spacing: 5px; font-size: 11px; color: #888888; margin-top: 8px; margin-bottom: 2rem;'>Fine Gold Collection</p>", unsafe_allow_html=True)
 
-st.markdown("<div style='width: 80px; height: 1px; background-color: #EAE5DD; margin: 0 auto 1.5rem auto;'></div>", unsafe_allow_html=True)
-
-st.markdown("<p style='text-align: center; font-family: Montserrat; color: #666666; font-size: 0.9rem; font-weight: 400; letter-spacing: 1px; margin-bottom: 0.2rem;'>Near Hanuman Mandir, Nanda Devi, Almora (Uttarakhand) - 263601</p>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; font-family: Montserrat; color: #888888; font-size: 0.8rem; font-weight: 300; letter-spacing: 1px; margin-bottom: 3rem;'>📞 +91 9412977788 &nbsp;|&nbsp; +91 9758838488 &nbsp;&nbsp;&bull;&nbsp;&nbsp; GST: 05ABQPV7823F1Z7</p>", unsafe_allow_html=True)
+# Minimal contact info
+st.markdown("<p style='text-align: center; font-family: Jost; color: #555555; font-size: 0.9rem; font-weight: 300; letter-spacing: 0.5px; margin-bottom: 0.2rem;'>Near Hanuman Mandir, Nanda Devi, Almora (Uttarakhand) - 263601</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; font-family: Jost; color: #999999; font-size: 0.8rem; font-weight: 300; letter-spacing: 1px; margin-bottom: 3rem;'>+91 9412977788 &nbsp;|&nbsp; +91 9758838488</p>", unsafe_allow_html=True)
 
 # --- 5. PUBLIC DISPLAY SYSTEM ---
 current_categories = get_categories()
 active_categories = []
 for cat in current_categories:
     cat_path = os.path.join(IMAGE_FOLDER, cat)
-    if os.path.exists(cat_path) and any(f.endswith((".png", ".jpg", ".jpeg", ".webp")) for f in os.listdir(cat_path)):
+    # Added .jpeg support here to match the studio updates
+    if os.path.exists(cat_path) and any(f.lower().endswith((".png", ".jpg", ".jpeg", ".webp")) for f in os.listdir(cat_path)):
         active_categories.append(cat)
 
 if not active_categories:
@@ -165,14 +189,14 @@ else:
             images_in_cat = [f for f in os.listdir(cat_path) if f.lower().endswith(supported_formats)]
             
             if images_in_cat:
-                cols = st.columns(3, gap="medium") # Added medium gap for better spacing
+                cols = st.columns(3, gap="large") # Wider gap for that airy, expensive feel
                 for index, img_name in enumerate(sorted(images_in_cat)):
                     current_col = cols[index % 3]
                     with current_col:
                         img_path = os.path.join(cat_path, img_name)
                         display_title = os.path.splitext(img_name)[0].replace("_", " ").title()
-                        st.markdown(render_premium_card(img_path, display_title), unsafe_allow_html=True)
+                        st.markdown(render_editorial_card(img_path, display_title), unsafe_allow_html=True)
 
-# --- 6. LUXURY FOOTER ---
-st.markdown("<br><br><div style='width: 100%; height: 1px; background-color: #EAE5DD; margin: 2rem 0;'></div>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; font-family: Montserrat; font-size: 0.75rem; color: #B0AFA9; letter-spacing: 1.5px;'>© 2026 NAVEEN JEWELLERS. CRAFTED WITH ELEGANCE.</p>", unsafe_allow_html=True)
+# --- 6. MINIMALIST FOOTER ---
+st.markdown("<br><br><br>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; font-family: Jost; font-size: 0.75rem; color: #999999; letter-spacing: 2px; text-transform: uppercase;'>© 2026 Naveen Jewellers</p>", unsafe_allow_html=True)
