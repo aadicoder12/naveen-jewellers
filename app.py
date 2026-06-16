@@ -10,24 +10,34 @@ IMAGE_FOLDER = "images"
 if not os.path.exists(IMAGE_FOLDER):
     os.makedirs(IMAGE_FOLDER)
 
-# --- 2. EDITORIAL HIGH-FASHION CSS INJECTION (MIDNIGHT GOLD THEME) ---
+# --- 2. EDITORIAL HIGH-FASHION CSS INJECTION (PREMIUM BLACK & GOLD) ---
 custom_css = """
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap');
     
     #MainMenu, footer, header {visibility: hidden;}
     
-    /* The Vault Background: Deep warm charcoal, not harsh black */
+    /* The Vault Background: Very deep charcoal/black */
     .stApp { 
-        background-color: #0F0F11; 
+        background-color: #080808; 
         font-family: 'Jost', sans-serif; 
         color: #E0E0E0; 
     }
     
-    /* Champagne Gold Headers */
-    h1, h2, h3 { 
+    /* Luxury Gold Gradient Title */
+    h1 { 
         font-family: 'Playfair Display', serif !important; 
-        color: #D4AF37 !important; /* Rich metallic gold */
+        background: linear-gradient(to right, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 500 !important;
+        text-shadow: 0px 4px 20px rgba(212, 175, 55, 0.1); /* Faint gold glow */
+    }
+    
+    /* Secondary Gold Headers */
+    h2, h3 { 
+        font-family: 'Playfair Display', serif !important; 
+        color: #D4AF37 !important; 
         font-weight: 500 !important;
     }
     
@@ -37,11 +47,11 @@ custom_css = """
         max-width: 1300px; 
     }
     
-    /* Minimalist Tabs with Gold Accents */
+    /* Minimalist Tabs with Gold Underlines */
     .stTabs [data-baseweb="tab-list"] { 
         gap: 40px; 
         justify-content: center; 
-        border-bottom: 1px solid #222222; 
+        border-bottom: 1px solid #2A2415; /* Tinted gold-brown border */
         padding-bottom: 15px;
         margin-bottom: 30px;
     }
@@ -50,18 +60,18 @@ custom_css = """
         text-transform: uppercase !important; 
         letter-spacing: 2px !important; 
         font-size: 12px !important; 
-        color: #666666 !important; 
+        color: #888888 !important; 
         background-color: transparent !important; 
         border: none !important; 
         padding: 0 10px 10px 10px !important;
         transition: all 0.3s ease;
     }
     .stTabs [data-baseweb="tab"]:hover { 
-        color: #E0E0E0 !important; 
+        color: #D4AF37 !important; /* Text turns gold on hover */
     }
     .stTabs [aria-selected="true"] { 
         color: #D4AF37 !important; 
-        border-bottom: 1px solid #D4AF37 !important; 
+        border-bottom: 2px solid #D4AF37 !important; /* Thicker gold line for active category */
     }
 
     /* Editorial Product Card Classes */
@@ -73,9 +83,10 @@ custom_css = """
         position: relative;
         overflow: hidden;
         margin-bottom: 15px;
-        background: #161618; /* Slightly lighter charcoal for image backdrop */
+        background: #111111; 
         aspect-ratio: 4/5; 
-        border: 1px solid #222222; /* Very faint border to frame the jewelry */
+        border: 1px solid #332810; /* Very subtle gold/brown frame around the photo */
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); /* Deep shadow to lift it off the background */
     }
     .img-wrapper img {
         width: 100%;
@@ -93,27 +104,28 @@ custom_css = """
         font-weight: 400;
         letter-spacing: 1.5px;
         text-transform: uppercase;
-        color: #E0E0E0; /* Soft white text */
+        color: #F3E5AB; /* Very soft champagne white/gold for text */
         margin: 0 0 12px 0;
     }
     
-    /* The Gold Inquire Button */
+    /* The Premium Gold Inquire Button */
     .btn-inquire {
         display: inline-block;
         padding: 10px 30px;
-        border: 1px solid #D4AF37; /* Gold border */
-        color: #D4AF37; /* Gold text */
+        border: 1px solid #D4AF37; 
+        color: #D4AF37; 
         text-decoration: none;
         font-family: 'Jost', sans-serif;
         font-size: 11px;
         text-transform: uppercase;
         letter-spacing: 2px;
-        background: transparent;
-        transition: all 0.3s ease;
+        background: rgba(212, 175, 55, 0.03); /* Barely visible gold tint inside */
+        transition: all 0.4s ease;
     }
     .btn-inquire:hover {
-        background: #D4AF37; /* Fills with solid gold on hover */
-        color: #0F0F11; /* Text turns dark charcoal */
+        background: #D4AF37; /* Fills with solid gold */
+        color: #080808; /* Text turns pitch black */
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.3); /* Button glows gold when hovered */
     }
 </style>
 """
