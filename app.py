@@ -10,23 +10,24 @@ IMAGE_FOLDER = "images"
 if not os.path.exists(IMAGE_FOLDER):
     os.makedirs(IMAGE_FOLDER)
 
-# --- 2. EDITORIAL HIGH-FASHION CSS INJECTION ---
+# --- 2. EDITORIAL HIGH-FASHION CSS INJECTION (MIDNIGHT GOLD THEME) ---
 custom_css = """
 <style>
-    /* Import modern editorial fonts: Playfair for headers, Jost for clean minimal text */
     @import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap');
     
     #MainMenu, footer, header {visibility: hidden;}
     
+    /* The Vault Background: Deep warm charcoal, not harsh black */
     .stApp { 
-        background-color: #FFFFFF; /* Pure white like Ejaa */
+        background-color: #0F0F11; 
         font-family: 'Jost', sans-serif; 
-        color: #111111; 
+        color: #E0E0E0; 
     }
     
+    /* Champagne Gold Headers */
     h1, h2, h3 { 
         font-family: 'Playfair Display', serif !important; 
-        color: #111111 !important; 
+        color: #D4AF37 !important; /* Rich metallic gold */
         font-weight: 500 !important;
     }
     
@@ -36,11 +37,11 @@ custom_css = """
         max-width: 1300px; 
     }
     
-    /* Ejaa-Style Minimalist Tabs */
+    /* Minimalist Tabs with Gold Accents */
     .stTabs [data-baseweb="tab-list"] { 
         gap: 40px; 
         justify-content: center; 
-        border-bottom: 1px solid #F0F0F0; 
+        border-bottom: 1px solid #222222; 
         padding-bottom: 15px;
         margin-bottom: 30px;
     }
@@ -49,18 +50,18 @@ custom_css = """
         text-transform: uppercase !important; 
         letter-spacing: 2px !important; 
         font-size: 12px !important; 
-        color: #888888 !important; 
+        color: #666666 !important; 
         background-color: transparent !important; 
         border: none !important; 
         padding: 0 10px 10px 10px !important;
-        transition: color 0.3s ease;
+        transition: all 0.3s ease;
     }
     .stTabs [data-baseweb="tab"]:hover { 
-        color: #111111 !important; 
+        color: #E0E0E0 !important; 
     }
     .stTabs [aria-selected="true"] { 
-        color: #111111 !important; 
-        border-bottom: 1px solid #111111 !important; 
+        color: #D4AF37 !important; 
+        border-bottom: 1px solid #D4AF37 !important; 
     }
 
     /* Editorial Product Card Classes */
@@ -72,8 +73,9 @@ custom_css = """
         position: relative;
         overflow: hidden;
         margin-bottom: 15px;
-        background: #F9F9F9; /* Very soft gray behind the image */
-        aspect-ratio: 4/5; /* High-fashion portrait aspect ratio */
+        background: #161618; /* Slightly lighter charcoal for image backdrop */
+        aspect-ratio: 4/5; 
+        border: 1px solid #222222; /* Very faint border to frame the jewelry */
     }
     .img-wrapper img {
         width: 100%;
@@ -83,7 +85,7 @@ custom_css = """
         cursor: zoom-in;
     }
     .img-wrapper:hover img {
-        transform: scale(1.08); /* Slow, smooth zoom on hover */
+        transform: scale(1.08); 
     }
     .product-title {
         font-family: 'Jost', sans-serif;
@@ -91,16 +93,16 @@ custom_css = """
         font-weight: 400;
         letter-spacing: 1.5px;
         text-transform: uppercase;
-        color: #333333;
+        color: #E0E0E0; /* Soft white text */
         margin: 0 0 12px 0;
     }
     
-    /* The High-Fashion Inquire Button */
+    /* The Gold Inquire Button */
     .btn-inquire {
         display: inline-block;
         padding: 10px 30px;
-        border: 1px solid #111111;
-        color: #111111;
+        border: 1px solid #D4AF37; /* Gold border */
+        color: #D4AF37; /* Gold text */
         text-decoration: none;
         font-family: 'Jost', sans-serif;
         font-size: 11px;
@@ -110,8 +112,8 @@ custom_css = """
         transition: all 0.3s ease;
     }
     .btn-inquire:hover {
-        background: #111111;
-        color: #FFFFFF;
+        background: #D4AF37; /* Fills with solid gold on hover */
+        color: #0F0F11; /* Text turns dark charcoal */
     }
 </style>
 """
