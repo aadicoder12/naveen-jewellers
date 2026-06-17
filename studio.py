@@ -27,7 +27,7 @@ def get_categories():
     return sorted(categories) if categories else ["Uncategorized"]
 
 st.title("🔐 Naveen Jewellers: Private Upload Studio")
-st.write("Manage your inventory. Optimized for High-Speed Loading.")
+st.write("Manage your inventory with total quality control.")
 st.write("---")
 
 # 1. Upload & Create Section
@@ -53,11 +53,20 @@ with col_manage:
         st.rerun()
 
 with col_upload:
-    st.write("### 📤 2. Upload Jewelry (Auto-Generates Thumbnails)")
+    st.write("### 📤 2. Upload Jewelry")
     categories = get_categories()
     selected_category = st.selectbox("Select category:", categories)
     
     st.info("💡 **Pro-Tip:** Upload a maximum of 20 to 30 images at a time.")
+    
+    # --- THE NEW QUALITY CONTROL TOGGLE ---
+    st.write("")
+    upload_mode = st.radio(
+        "⚙️ **Choose Image Engine:**",
+        ["⚡ Fast Mobile Grid (High-Res + 600px Thumbnail)", "💎 Pure High-Res Only (No Thumbnail)"],
+        help="Fast Mobile creates a lightweight copy for the main website to ensure instant loading. Pure High-Res skips the copy and forces the website to load the massive original file."
+    )
+    st.write("")
     
     uploaded_files = st.file_uploader(
         "Drop images", 
@@ -102,8 +111,8 @@ with col_upload:
                     out.write(f.getbuffer())
                 img_for_thumbnail = Image.open(f)
             
-            # --- PHASE 2: Generate Lightning-Fast Thumbnail ---
-            if img_for_thumbnail:
+            # --- PHASE 2: Check Toggle Before Generating Thumbnail ---
+            if upload_mode == "⚡ Fast Mobile Grid (High-Res + 600px Thumbnail)" and img_for_thumbnail:
                 with st.spinner(f"Generating optimized thumbnail for {f.name}..."):
                     if img_for_thumbnail.mode in ("RGBA", "P"):
                         img_for_thumbnail = img_for_thumbnail.convert("RGB")
@@ -118,7 +127,7 @@ with col_upload:
                     # Save highly compressed thumbnail
                     img_for_thumbnail.save(thumb_path, "WEBP", quality=85)
         
-        st.success("Uploaded & Thumbnails Processed successfully!")
+        st.success(f"Successfully processed using: {upload_mode.split('(')[0]}")
         del st.session_state["uploader"]
         st.rerun()
 
