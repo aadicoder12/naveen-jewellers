@@ -9,7 +9,7 @@ IMAGE_FOLDER = "images"
 if not os.path.exists(IMAGE_FOLDER):
     os.makedirs(IMAGE_FOLDER)
 
-# --- 2. PREMIUM BLACK & GOLD CSS (WITH MOBILE RESPONSIVENESS) ---
+# --- 2. PREMIUM BLACK & GOLD CSS (WITH SMART SHAPES) ---
 custom_css = """
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap');
@@ -81,27 +81,23 @@ custom_css = """
         margin-bottom: 20px;
     }
     
-    /* THE CROPPING FIX: aspect-ratio 1/1 and object-fit contain */
-    .img-wrapper {
-        position: relative;
-        overflow: hidden;
-        margin-bottom: 15px;
-        background: #111111; 
-        aspect-ratio: 1 / 1; 
-        border: 1px solid #332810; 
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); 
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    /* --- SHAPE 1: THE SQUARE BOX (For Rings, Bangles, Tops) --- */
+    .img-wrapper-square {
+        position: relative; overflow: hidden; margin-bottom: 15px;
+        background: #111111; aspect-ratio: 1 / 1; border: 1px solid #332810; 
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center;
     }
-    .img-wrapper img {
-        width: 92%; 
-        height: 92%;
-        object-fit: contain; 
-        transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        cursor: zoom-in;
+    .img-wrapper-square img { width: 92%; height: 92%; object-fit: contain; transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); cursor: zoom-in; }
+    .img-wrapper-square:hover img { transform: scale(1.08); }
+
+    /* --- SHAPE 2: THE TALL BOX (For Chains, Mangalsutras, Maang Tikkas) --- */
+    .img-wrapper-tall {
+        position: relative; overflow: hidden; margin-bottom: 15px;
+        background: #111111; aspect-ratio: 3 / 4; border: 1px solid #332810; 
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center;
     }
-    .img-wrapper:hover img { transform: scale(1.08); }
+    .img-wrapper-tall img { width: 100%; height: 100%; padding: 6%; object-fit: contain; transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); cursor: zoom-in; }
+    .img-wrapper-tall:hover img { transform: scale(1.08); }
     
     .product-title {
         font-family: 'Jost', sans-serif;
@@ -163,8 +159,8 @@ custom_css = """
 """
 st.markdown(custom_css, unsafe_allow_html=True)
 
-# --- 3. DUAL-PATH CDN RENDERER (Ultra-Fast) ---
-def render_editorial_card(high_res_path, thumb_path, title):
+# --- 3. DUAL-PATH CDN RENDERER (SMART SHAPE ENGINE) ---
+def render_editorial_card(high_res_path, thumb_path, title, category_name):
     # Safe URLs for GitHub
     safe_high_res = high_res_path.replace('\\', '/').replace(' ', '%20')
     safe_thumb = thumb_path.replace('\\', '/').replace(' ', '%20')
@@ -172,15 +168,24 @@ def render_editorial_card(high_res_path, thumb_path, title):
     github_high_res_url = f"https://raw.githubusercontent.com/aadicoder12/naveen-jewellers/main/{safe_high_res}"
     github_thumb_url = f"https://raw.githubusercontent.com/aadicoder12/naveen-jewellers/main/{safe_thumb}"
     
-    # WhatsApp Integration (Country code 91 included for API link safety)
+    # WhatsApp Integration
     whatsapp_number = "918439699542" 
     raw_message = f"Hi Naveen Jewellers, I am interested in the {title}."
     encoded_message = urllib.parse.quote(raw_message)
     whatsapp_url = f"https://wa.me/{whatsapp_number}?text={encoded_message}"
     
+    # --- The Intelligence Engine ---
+    cat_lower = category_name.lower()
+    tall_categories = ["mangalsutra", "maang tikka", "chain", "chains", "gold chain", "gold chains", "necklace", "necklaces"]
+    
+    if any(tall_word in cat_lower for tall_word in tall_categories):
+        wrapper_class = "img-wrapper-tall"
+    else:
+        wrapper_class = "img-wrapper-square"
+    
     html_code = f"""
 <div class="editorial-card">
-    <div class="img-wrapper">
+    <div class="{wrapper_class}">
         <a href="{github_high_res_url}" target="_blank" title="View High-Res Image">
             <img src="{github_thumb_url}" loading="lazy">
         </a>
@@ -243,7 +248,9 @@ else:
                         thumb_path = high_res_path
                         
                     display_title = name_only.replace("_", " ").title()
-                    grid_html += render_editorial_card(high_res_path, thumb_path, display_title)
+                    
+                    # Passing category_name into the function so it knows which shape to use!
+                    grid_html += render_editorial_card(high_res_path, thumb_path, display_title, category_name)
                 grid_html += '</div>'
                 
                 st.markdown(grid_html, unsafe_allow_html=True)
