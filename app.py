@@ -70,7 +70,7 @@ custom_css = """
     /* --- THE NEW RESPONSIVE GRID SYSTEM --- */
     .jewelry-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr); /* 3 Columns on Laptops */
+        grid-template-columns: repeat(3, 1fr); 
         gap: 40px;
         margin-top: 20px;
     }
@@ -87,7 +87,7 @@ custom_css = """
         overflow: hidden;
         margin-bottom: 15px;
         background: #111111; 
-        aspect-ratio: 1 / 1; /* Perfect Square for Pairs of Tops/Earrings */
+        aspect-ratio: 1 / 1; 
         border: 1px solid #332810; 
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5); 
         display: flex;
@@ -95,9 +95,9 @@ custom_css = """
         justify-content: center;
     }
     .img-wrapper img {
-        width: 92%; /* Creates a slight dark border padding around the jewelry */
+        width: 92%; 
         height: 92%;
-        object-fit: contain; /* THIS FIXES THE CROPPING. 100% of image is visible. */
+        object-fit: contain; 
         transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         cursor: zoom-in;
     }
@@ -135,27 +135,27 @@ custom_css = """
     /* --- MOBILE PHONE OPTIMIZATIONS (ANDROID & iPHONE) --- */
     @media (max-width: 768px) {
         h1 { 
-            font-size: 2.2rem; /* Smaller title so it doesn't break into 3 lines */
+            font-size: 2.2rem; 
             margin-top: 0.5rem;
         }
         .jewelry-grid {
-            grid-template-columns: repeat(2, 1fr); /* 2 items side-by-side on phones */
-            gap: 15px; /* Tighter spacing for small screens */
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 15px; 
         }
         .stTabs [data-baseweb="tab-list"] { 
             gap: 15px; 
-            flex-wrap: wrap; /* Allows tabs to stack nicely if there are many categories */
+            flex-wrap: wrap; 
         }
         .stTabs [data-baseweb="tab"] {
             font-size: 10px !important;
             padding: 0 5px 8px 5px !important;
         }
         .product-title {
-            font-size: 11px; /* Smaller font for 2-column mobile layout */
+            font-size: 11px; 
             letter-spacing: 1px;
         }
         .btn-inquire {
-            padding: 8px 18px; /* Slightly more compact button for thumbs */
+            padding: 8px 18px; 
             font-size: 10px;
         }
     }
@@ -163,24 +163,26 @@ custom_css = """
 """
 st.markdown(custom_css, unsafe_allow_html=True)
 
-# --- 3. CDN PRODUCT CARD RENDERER (Ultra-Fast) ---
-# --- 3. CDN PRODUCT CARD RENDERER (Ultra-Fast) ---
-def render_editorial_card(img_path, title):
-    # Convert local file path directly into the raw GitHub URL
-    safe_url_path = img_path.replace('\\', '/').replace(' ', '%20')
-    github_cdn_url = f"https://raw.githubusercontent.com/aadicoder12/naveen-jewellers/main/{safe_url_path}"
+# --- 3. DUAL-PATH CDN RENDERER (Ultra-Fast) ---
+def render_editorial_card(high_res_path, thumb_path, title):
+    # Safe URLs for GitHub
+    safe_high_res = high_res_path.replace('\\', '/').replace(' ', '%20')
+    safe_thumb = thumb_path.replace('\\', '/').replace(' ', '%20')
     
-    whatsapp_number = "8439699542" 
+    github_high_res_url = f"https://raw.githubusercontent.com/aadicoder12/naveen-jewellers/main/{safe_high_res}"
+    github_thumb_url = f"https://raw.githubusercontent.com/aadicoder12/naveen-jewellers/main/{safe_thumb}"
+    
+    # WhatsApp Integration (Country code 91 included for API link safety)
+    whatsapp_number = "918439699542" 
     raw_message = f"Hi Naveen Jewellers, I am interested in the {title}."
     encoded_message = urllib.parse.quote(raw_message)
     whatsapp_url = f"https://wa.me/{whatsapp_number}?text={encoded_message}"
     
-    # Added the WhatsApp SVG Icon inside the button, perfectly aligned with the text
     html_code = f"""
 <div class="editorial-card">
     <div class="img-wrapper">
-        <a href="{github_cdn_url}" target="_blank" title="View High-Res Image">
-            <img src="{github_cdn_url}" loading="lazy">
+        <a href="{github_high_res_url}" target="_blank" title="View High-Res Image">
+            <img src="{github_thumb_url}" loading="lazy">
         </a>
     </div>
     <div class="product-title">{title}</div>
@@ -205,7 +207,7 @@ st.markdown("<p style='text-align: center; font-family: Jost; text-transform: up
 st.markdown("<p style='text-align: center; font-family: Jost; color: #A0A0A0; font-size: 0.9rem; font-weight: 300; letter-spacing: 0.5px; margin-bottom: 0.2rem;'>Near Hanuman Mandir, Nanda Devi, Almora (Uttarakhand) - 263601</p>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; font-family: Jost; color: #888888; font-size: 0.8rem; font-weight: 300; letter-spacing: 1px; margin-bottom: 3rem;'>+91 9412977788 &nbsp;|&nbsp; +91 9758838488</p>", unsafe_allow_html=True)
 
-# --- 5. PUBLIC DISPLAY SYSTEM (Now powered by CSS Grid) ---
+# --- 5. PUBLIC DISPLAY SYSTEM ---
 current_categories = get_categories()
 active_categories = []
 for cat in current_categories:
@@ -223,18 +225,27 @@ else:
         with tab:
             st.write("<br>", unsafe_allow_html=True)
             supported_formats = (".png", ".jpg", ".jpeg", ".webp")
-            images_in_cat = [f for f in os.listdir(cat_path) if f.lower().endswith(supported_formats)]
+            
+            # Smart Engine: Grabs original files, completely ignores the _thumb duplicates
+            images_in_cat = [f for f in os.listdir(cat_path) if f.lower().endswith(supported_formats) and "_thumb" not in f.lower()]
             
             if images_in_cat:
-                # We build a single block of HTML with our new Responsive Grid
                 grid_html = '<div class="jewelry-grid">'
                 for img_name in sorted(images_in_cat):
-                    img_path = os.path.join(cat_path, img_name)
-                    display_title = os.path.splitext(img_name)[0].replace("_", " ").title()
-                    grid_html += render_editorial_card(img_path, display_title)
+                    high_res_path = os.path.join(cat_path, img_name)
+                    
+                    # Construct the thumbnail path
+                    name_only = os.path.splitext(img_name)[0]
+                    thumb_path = os.path.join(cat_path, f"{name_only}_thumb.webp")
+                    
+                    # Failsafe: if thumbnail doesn't exist yet, use original image so nothing breaks
+                    if not os.path.exists(thumb_path):
+                        thumb_path = high_res_path
+                        
+                    display_title = name_only.replace("_", " ").title()
+                    grid_html += render_editorial_card(high_res_path, thumb_path, display_title)
                 grid_html += '</div>'
                 
-                # Render the whole grid at once
                 st.markdown(grid_html, unsafe_allow_html=True)
 
 # --- 6. MINIMALIST FOOTER ---
