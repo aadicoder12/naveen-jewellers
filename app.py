@@ -1,6 +1,5 @@
 import streamlit as st
 import os
-import base64
 import urllib.parse
 
 # 1. Page Configuration
@@ -164,34 +163,23 @@ custom_css = """
 """
 st.markdown(custom_css, unsafe_allow_html=True)
 
-# --- IMAGE CACHING ENGINE ---
-@st.cache_data(show_spinner=False)
-def get_image_base64(img_path):
-    with open(img_path, "rb") as image_file:
-        return base64.b64encode(image_file.read()).decode()
-
-# --- 3. EDITORIAL PRODUCT CARD RENDERER ---
+# --- 3. CDN PRODUCT CARD RENDERER (Ultra-Fast) ---
 def render_editorial_card(img_path, title):
-    encoded_string = get_image_base64(img_path)
-    
-    ext = os.path.splitext(img_path)[1].lower()
-    mime_type = "image/jpeg"
-    if ext == ".png": mime_type = "image/png"
-    elif ext == ".webp": mime_type = "image/webp"
+    # Convert local file path directly into the raw GitHub URL
+    safe_url_path = img_path.replace('\\', '/').replace(' ', '%20')
+    github_cdn_url = f"https://raw.githubusercontent.com/aadicoder12/naveen-jewellers/main/{safe_url_path}"
     
     whatsapp_number = "919412977788" 
     raw_message = f"Hi Naveen Jewellers, I am interested in the {title}."
     encoded_message = urllib.parse.quote(raw_message)
     whatsapp_url = f"https://wa.me/{whatsapp_number}?text={encoded_message}"
     
-    safe_url_path = img_path.replace('\\', '/').replace(' ', '%20')
-    github_high_res_url = f"https://raw.githubusercontent.com/aadicoder12/naveen-jewellers/main/{safe_url_path}"
-    
+    # The Base64 engine is gone. The image src is now just the fast GitHub URL!
     html_code = f"""
 <div class="editorial-card">
     <div class="img-wrapper">
-        <a href="{github_high_res_url}" target="_blank" title="View High-Res Image">
-            <img src="data:{mime_type};base64,{encoded_string}" loading="lazy">
+        <a href="{github_cdn_url}" target="_blank" title="View High-Res Image">
+            <img src="{github_cdn_url}" loading="lazy">
         </a>
     </div>
     <div class="product-title">{title}</div>
