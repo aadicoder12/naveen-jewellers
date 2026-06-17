@@ -16,7 +16,7 @@ if not os.path.exists(".git"):
     st.error("🚨 CRITICAL ERROR: You are in the wrong folder!")
     st.warning("Your computer cannot push to the live website because you are not inside the main GitHub vault.")
     st.info("**How to fix this:**\n1. Close VS Code.\n2. Move `studio.py`, `app.py`, and your `images/` folder directly inside the `naveen-jewellers` folder.\n3. Open VS Code, click **File > Open Folder**, and select the `naveen-jewellers` folder.\n4. Run the app again.")
-    st.stop() # Stops the rest of the app from running until they fix it
+    st.stop() 
 
 IMAGE_FOLDER = "images"
 if not os.path.exists(IMAGE_FOLDER):
@@ -27,7 +27,7 @@ def get_categories():
     return sorted(categories) if categories else ["Uncategorized"]
 
 st.title("🔐 Naveen Jewellers: Private Upload Studio")
-st.write("Manage your inventory. Optimized for speed.")
+st.write("Manage your inventory. Optimized for High-Speed Loading.")
 st.write("---")
 
 # 1. Upload & Create Section
@@ -53,11 +53,11 @@ with col_manage:
         st.rerun()
 
 with col_upload:
-    st.write("### 📤 2. Upload Jewelry")
+    st.write("### 📤 2. Upload Jewelry (Auto-Generates Thumbnails)")
     categories = get_categories()
     selected_category = st.selectbox("Select category:", categories)
     
-    st.info("💡 **Pro-Tip:** To prevent 'Connection Failed' errors, upload a maximum of 20 to 30 images at a time.")
+    st.info("💡 **Pro-Tip:** Upload a maximum of 20 to 30 images at a time.")
     
     uploaded_files = st.file_uploader(
         "Drop images", 
@@ -74,25 +74,51 @@ with col_upload:
             file_name = f.name.lower().replace(" ", "_")
             ext = os.path.splitext(file_name)[1]
             
+            high_res_path = ""
+            img_for_thumbnail = None
+            
+            # --- PHASE 1: Save High-Res Original ---
             if ext == '.dng':
                 with st.spinner(f"Converting raw file {f.name} to WebP..."):
                     with rawpy.imread(f) as raw:
                         rgb = raw.postprocess()
                     img = Image.fromarray(rgb)
                     new_file_name = file_name.replace(".dng", ".webp")
-                    img.save(os.path.join(cat_path, new_file_name), "WEBP", quality=95)
+                    high_res_path = os.path.join(cat_path, new_file_name)
+                    img.save(high_res_path, "WEBP", quality=95)
+                    img_for_thumbnail = img.copy()
                     
             elif ext == '.heic':
                 with st.spinner(f"Converting iPhone HEIC {f.name} to WebP..."):
                     img = Image.open(f)
                     new_file_name = file_name.replace(".heic", ".webp")
-                    img.save(os.path.join(cat_path, new_file_name), "WEBP", quality=95)
+                    high_res_path = os.path.join(cat_path, new_file_name)
+                    img.save(high_res_path, "WEBP", quality=95)
+                    img_for_thumbnail = img.copy()
                     
             else:
-                with open(os.path.join(cat_path, file_name), "wb") as out:
+                high_res_path = os.path.join(cat_path, file_name)
+                with open(high_res_path, "wb") as out:
                     out.write(f.getbuffer())
+                img_for_thumbnail = Image.open(f)
+            
+            # --- PHASE 2: Generate Lightning-Fast Thumbnail ---
+            if img_for_thumbnail:
+                with st.spinner(f"Generating optimized thumbnail for {f.name}..."):
+                    if img_for_thumbnail.mode in ("RGBA", "P"):
+                        img_for_thumbnail = img_for_thumbnail.convert("RGB")
+                    
+                    # Resize to Retina Sweet Spot
+                    img_for_thumbnail.thumbnail((600, 600))
+                    
+                    # Create thumbnail file name
+                    base_name = os.path.splitext(os.path.basename(high_res_path))[0]
+                    thumb_path = os.path.join(cat_path, f"{base_name}_thumb.webp")
+                    
+                    # Save highly compressed thumbnail
+                    img_for_thumbnail.save(thumb_path, "WEBP", quality=85)
         
-        st.success("Uploaded & Processed successfully!")
+        st.success("Uploaded & Thumbnails Processed successfully!")
         del st.session_state["uploader"]
         st.rerun()
 
@@ -109,7 +135,8 @@ if selected_cat:
     if not os.path.exists(cat_path):
         all_files = []
     else:
-        all_files = sorted([f for f in os.listdir(cat_path) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.webp'))])
+        # Hide _thumb files from the inventory view so we don't see duplicates
+        all_files = sorted([f for f in os.listdir(cat_path) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')) and "_thumb" not in f])
     
     if not all_files:
         st.info("No images here.")
@@ -126,9 +153,20 @@ if selected_cat:
         for i, img_name in enumerate(current_page_files):
             with cols[i % 4]:
                 img_path = os.path.join(cat_path, img_name)
+                
+                # Show the image
                 st.image(img_path, use_container_width=True)
+                
                 if st.button("Delete", key=f"del_{img_name}"):
+                    # 1. Delete High-Res original
                     os.remove(img_path)
+                    
+                    # 2. Secretly delete the matching thumbnail if it exists
+                    base_name = os.path.splitext(img_name)[0]
+                    thumb_path = os.path.join(cat_path, f"{base_name}_thumb.webp")
+                    if os.path.exists(thumb_path):
+                        os.remove(thumb_path)
+                        
                     st.rerun()
 
 # --- 3. Publish & Sync to Live Server ---
@@ -157,7 +195,7 @@ with col_push:
                     st.error(f"Failed to add files: {add_result.stderr}")
                     st.stop()
 
-                commit_result = subprocess.run(["git", "commit", "-m", "Auto-update inventory via Studio"], capture_output=True, text=True)
+                commit_result = subprocess.run(["git", "commit", "-m", "Auto-update inventory & thumbnails via Studio"], capture_output=True, text=True)
                 if "nothing to commit" in commit_result.stdout or "nothing to commit" in commit_result.stderr:
                     st.info("Everything is already up to date! No new changes to push.")
                     st.stop()
