@@ -159,14 +159,16 @@ custom_css = """
 """
 st.markdown(custom_css, unsafe_allow_html=True)
 
-# --- 3. DUAL-PATH CDN RENDERER (SMART SHAPE ENGINE) ---
+# --- 3. DUAL-PATH CDN RENDERER (SMART SHAPE ENGINE & JSDELIVR EDGE CDN) ---
 def render_editorial_card(high_res_path, thumb_path, title, category_name):
-    # Safe URLs for GitHub
+    # Safe URLs for GitHub/jsDelivr
     safe_high_res = high_res_path.replace('\\', '/').replace(' ', '%20')
     safe_thumb = thumb_path.replace('\\', '/').replace(' ', '%20')
     
-    github_high_res_url = f"https://raw.githubusercontent.com/aadicoder12/naveen-jewellers/main/{safe_high_res}"
-    github_thumb_url = f"https://raw.githubusercontent.com/aadicoder12/naveen-jewellers/main/{safe_thumb}"
+    # THE MASSIVE SPEED UPGRADE: Now using jsDelivr Edge Network instead of raw GitHub!
+    # It pulls from servers in Mumbai/Delhi instead of the USA.
+    github_high_res_url = f"https://cdn.jsdelivr.net/gh/aadicoder12/naveen-jewellers@main/{safe_high_res}"
+    github_thumb_url = f"https://cdn.jsdelivr.net/gh/aadicoder12/naveen-jewellers@main/{safe_thumb}"
     
     # WhatsApp Integration
     whatsapp_number = "918439699542" 
