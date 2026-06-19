@@ -11,23 +11,61 @@ pillow_heif.register_heif_opener()
 
 st.set_page_config(page_title="Admin - Naveen Jewellers", layout="wide", page_icon="🔐")
 
-# 🚨 THE VAULT GUARD: Prevents the "Folder-in-a-Folder" Trap
+# 🚨 THE VAULT GUARD
 if not os.path.exists(".git"):
     st.error("🚨 CRITICAL ERROR: You are in the wrong folder!")
-    st.warning("Your computer cannot push to the live website because you are not inside the main GitHub vault.")
-    st.info("**How to fix this:**\n1. Close VS Code.\n2. Move `studio.py`, `app.py`, and your `images/` folder directly inside the `naveen-jewellers` folder.\n3. Open VS Code, click **File > Open Folder**, and select the `naveen-jewellers` folder.\n4. Run the app again.")
     st.stop() 
 
 IMAGE_FOLDER = "images"
 if not os.path.exists(IMAGE_FOLDER):
     os.makedirs(IMAGE_FOLDER)
 
+# --- WATERMARK ENGINE CORE (CENTERED & TRANSPARENT) ---
+def apply_watermark(base_image):
+    watermark_path = "watermark.png"
+    if not os.path.exists(watermark_path):
+        return base_image # Returns normal image if no watermark file exists
+        
+    try:
+        # Open watermark and ensure it has transparency
+        watermark = Image.open(watermark_path).convert("RGBA")
+        
+        # 1. Size it beautifully: Make the logo take up 50% of the image width
+        base_width, base_height = base_image.size
+        wm_width = int(base_width * 0.50)
+        wm_ratio = wm_width / float(watermark.size[0])
+        wm_height = int(float(watermark.size[1]) * float(wm_ratio))
+        
+        # Resize watermark cleanly
+        watermark = watermark.resize((wm_width, wm_height), Image.Resampling.LANCZOS)
+        
+        # 2. The "Frosted Glass" Transparency Trick (Drops opacity to 25%)
+        # This prevents the watermark from hiding the jewelry details
+        alpha = watermark.split()[3]
+        alpha = alpha.point(lambda p: int(p * 0.25)) 
+        watermark.putalpha(alpha)
+        
+        # 3. Calculate Position: Dead Center
+        x_center = (base_width - wm_width) // 2
+        y_center = (base_height - wm_height) // 2
+        position = (x_center, y_center)
+        
+        # Merge them together safely
+        transparent_layer = Image.new('RGBA', base_image.size, (0,0,0,0))
+        transparent_layer.paste(base_image.convert("RGBA"), (0,0))
+        transparent_layer.paste(watermark, position, mask=watermark)
+        
+        return transparent_layer.convert("RGB")
+    except Exception as e:
+        st.error(f"Watermark error: {e}")
+        return base_image
+
 def get_categories():
     categories = [f.name for f in os.scandir(IMAGE_FOLDER) if f.is_dir()]
     return sorted(categories) if categories else ["Uncategorized"]
 
 st.title("🔐 Naveen Jewellers: Private Upload Studio")
-st.write("Manage your inventory with total quality control.")
+st.write("Manage your inventory with total quality control & business protection.")
 st.write("---")
 
 # 1. Upload & Create Section
@@ -35,7 +73,6 @@ col_upload, col_manage = st.columns([2, 1])
 
 with col_manage:
     st.write("### 📁 1. Create/Delete Categories")
-    
     new_category = st.text_input("New category name:")
     if st.button("Add Category"):
         if new_category:
@@ -57,15 +94,14 @@ with col_upload:
     categories = get_categories()
     selected_category = st.selectbox("Select category:", categories)
     
-    st.info("💡 **Pro-Tip:** Upload a maximum of 20 to 30 images at a time.")
-    
-    # --- THE NEW QUALITY CONTROL TOGGLE ---
     st.write("")
     upload_mode = st.radio(
         "⚙️ **Choose Image Engine:**",
-        ["⚡ Fast Mobile Grid (High-Res + 600px Thumbnail)", "💎 Pure High-Res Only (No Thumbnail)"],
-        help="Fast Mobile creates a lightweight copy for the main website to ensure instant loading. Pure High-Res skips the copy and forces the website to load the massive original file."
+        ["⚡ Fast Mobile Grid (High-Res + 600px Thumbnail)", "💎 Pure High-Res Only (No Thumbnail)"]
     )
+    
+    # --- WATERMARK TOGGLE ---
+    use_watermark = st.checkbox("🛡️ Apply 'Naveen Jewellers' Watermark", value=False, help="Requires a 'watermark.png' file in your main folder. Stamps your logo in the bottom right corner to prevent theft.")
     st.write("")
     
     uploaded_files = st.file_uploader(
@@ -76,6 +112,9 @@ with col_upload:
     )
     
     if uploaded_files and st.button("Publish All to Category"):
+        if use_watermark and not os.path.exists("watermark.png"):
+            st.warning("⚠️ You checked 'Apply Watermark', but 'watermark.png' is missing from your folder. Uploading without watermark.")
+            
         cat_path = os.path.join(IMAGE_FOLDER, selected_category)
         os.makedirs(cat_path, exist_ok=True)
         
@@ -86,45 +125,38 @@ with col_upload:
             high_res_path = ""
             img_for_thumbnail = None
             
-            # --- PHASE 1: Save High-Res Original ---
-            if ext == '.dng':
-                with st.spinner(f"Converting raw file {f.name} to WebP..."):
+            # --- OPEN IMAGE & APPLY WATERMARK ---
+            with st.spinner(f"Processing {f.name}..."):
+                if ext == '.dng':
                     with rawpy.imread(f) as raw:
                         rgb = raw.postprocess()
-                    img = Image.fromarray(rgb)
-                    new_file_name = file_name.replace(".dng", ".webp")
-                    high_res_path = os.path.join(cat_path, new_file_name)
-                    img.save(high_res_path, "WEBP", quality=95)
-                    img_for_thumbnail = img.copy()
+                    base_img = Image.fromarray(rgb)
+                elif ext == '.heic':
+                    base_img = Image.open(f)
+                else:
+                    base_img = Image.open(f)
+                
+                # Apply Watermark if checked and file exists
+                if use_watermark:
+                    base_img = apply_watermark(base_img)
+                
+                # --- PHASE 1: Save High-Res Original ---
+                new_file_name = file_name.replace(ext, ".webp")
+                high_res_path = os.path.join(cat_path, new_file_name)
+                
+                # Convert to RGB before saving as WEBP
+                if base_img.mode in ("RGBA", "P"):
+                    base_img = base_img.convert("RGB")
                     
-            elif ext == '.heic':
-                with st.spinner(f"Converting iPhone HEIC {f.name} to WebP..."):
-                    img = Image.open(f)
-                    new_file_name = file_name.replace(".heic", ".webp")
-                    high_res_path = os.path.join(cat_path, new_file_name)
-                    img.save(high_res_path, "WEBP", quality=95)
-                    img_for_thumbnail = img.copy()
-                    
-            else:
-                high_res_path = os.path.join(cat_path, file_name)
-                with open(high_res_path, "wb") as out:
-                    out.write(f.getbuffer())
-                img_for_thumbnail = Image.open(f)
+                base_img.save(high_res_path, "WEBP", quality=95)
+                img_for_thumbnail = base_img.copy()
             
-            # --- PHASE 2: Check Toggle Before Generating Thumbnail ---
+            # --- PHASE 2: Generate Lightning-Fast Thumbnail ---
             if upload_mode == "⚡ Fast Mobile Grid (High-Res + 600px Thumbnail)" and img_for_thumbnail:
                 with st.spinner(f"Generating optimized thumbnail for {f.name}..."):
-                    if img_for_thumbnail.mode in ("RGBA", "P"):
-                        img_for_thumbnail = img_for_thumbnail.convert("RGB")
-                    
-                    # Resize to Retina Sweet Spot
                     img_for_thumbnail.thumbnail((600, 600))
-                    
-                    # Create thumbnail file name
                     base_name = os.path.splitext(os.path.basename(high_res_path))[0]
                     thumb_path = os.path.join(cat_path, f"{base_name}_thumb.webp")
-                    
-                    # Save highly compressed thumbnail
                     img_for_thumbnail.save(thumb_path, "WEBP", quality=85)
         
         st.success(f"Successfully processed using: {upload_mode.split('(')[0]}")
@@ -134,7 +166,6 @@ with col_upload:
 st.write("---")
 st.write("### 🗑️ Manage Current Inventory")
 
-# 2. Optimized Inventory Section
 current_categories = get_categories()
 selected_cat = st.selectbox("View inventory for category:", current_categories)
 
@@ -144,7 +175,6 @@ if selected_cat:
     if not os.path.exists(cat_path):
         all_files = []
     else:
-        # Hide _thumb files from the inventory view so we don't see duplicates
         all_files = sorted([f for f in os.listdir(cat_path) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')) and "_thumb" not in f])
     
     if not all_files:
@@ -162,20 +192,14 @@ if selected_cat:
         for i, img_name in enumerate(current_page_files):
             with cols[i % 4]:
                 img_path = os.path.join(cat_path, img_name)
-                
-                # Show the image
                 st.image(img_path, use_container_width=True)
                 
                 if st.button("Delete", key=f"del_{img_name}"):
-                    # 1. Delete High-Res original
                     os.remove(img_path)
-                    
-                    # 2. Secretly delete the matching thumbnail if it exists
                     base_name = os.path.splitext(img_name)[0]
                     thumb_path = os.path.join(cat_path, f"{base_name}_thumb.webp")
                     if os.path.exists(thumb_path):
                         os.remove(thumb_path)
-                        
                     st.rerun()
 
 # --- 3. Publish & Sync to Live Server ---
@@ -204,7 +228,7 @@ with col_push:
                     st.error(f"Failed to add files: {add_result.stderr}")
                     st.stop()
 
-                commit_result = subprocess.run(["git", "commit", "-m", "Auto-update inventory & thumbnails via Studio"], capture_output=True, text=True)
+                commit_result = subprocess.run(["git", "commit", "-m", "Auto-update inventory via Studio"], capture_output=True, text=True)
                 if "nothing to commit" in commit_result.stdout or "nothing to commit" in commit_result.stderr:
                     st.info("Everything is already up to date! No new changes to push.")
                     st.stop()
@@ -218,8 +242,7 @@ with col_push:
                     st.balloons()
                 else:
                     st.error(f"Push to GitHub failed. Error detail:\n{push_result.stderr}")
-                    
             except subprocess.TimeoutExpired:
-                st.error("The connection timed out. Your internet might have dropped, or the files were too large. Try again in smaller batches.")
+                st.error("The connection timed out. Try again in smaller batches.")
             except Exception as e:
                 st.error(f"An unexpected error occurred: {e}")
